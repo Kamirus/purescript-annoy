@@ -1,0 +1,13 @@
+{
+  "name": "purescript-annoy",
+  "set": "df",
+  "source": "https://github.com/lambdaterms-forks/package-sets.git",
+  "depends": [
+    "foreign-generic",
+    "foreign",
+    "psci-support",
+    "console",
+    "eff",
+    "prelude"
+  ]
+}
