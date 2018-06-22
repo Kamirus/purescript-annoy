@@ -28,21 +28,21 @@ exports.unsafeBuild = function(n_trees) {
   };
 };
 
-// exports.save = function(annoy) {
-//   return function(path) {
-//     return function() {
-//       annoy.save(path);
-//     };
-//   };
-// };
+exports.save = function(path) {
+  return function(annoy) {
+    return function() {
+      return annoy.save(path);
+    };
+  };
+};
 
-// exports.load = function(annoy) {
-//   return function(path) {
-//     return function() {
-//       annoy.load(path);
-//     };
-//   };
-// };
+exports.load = function(path) {
+  return function(annoy) {
+    return function() {
+      return annoy.load(path);
+    };
+  };
+};
 
 // exports.unload = function(annoy) {
 //   return function() {
@@ -52,7 +52,9 @@ exports.unsafeBuild = function(n_trees) {
 
 exports.unsafeGetItem = function(i) {
   return function(annoy) {
-    return annoy.getItem(i);
+    return function() {
+      return annoy.getItem(i);
+    };
   };
 };
 
