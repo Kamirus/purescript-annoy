@@ -45,9 +45,48 @@ foreign import load
   -> STAnnoy h
   -> Eff (st :: ST h, fs :: FS | r) Boolean
 
+foreign import unload
+  :: forall h r
+  .  STAnnoy h
+  -> Eff (st :: ST h, fs :: FS | r) Unit
+
 -- | Returns vector under given index. No bounds checks are performed.
 foreign import unsafeGetItem
   :: forall h r
   .  Int
   -> STAnnoy h
   -> Eff (st :: ST h | r) (Array Number)
+
+-- | `unsafeGetNNsByItem i n search_k`
+-- | Returns `n` closest items to the `i`-th vector. Pass default -1 for `search_k`, for more info visit [original annoy](https://github.com/spotify/annoy). No bounds checks are performed.
+foreign import unsafeGetNNsByItem
+  :: forall h r
+  .  Int
+  -> Int
+  -> Int
+  -> STAnnoy h
+  -> Eff (st :: ST h | r) (Array Int)
+
+-- | `unsafeGetNNsByVector v n search_k`
+-- | Like above but query by vector v instead of index.
+foreign import unsafeGetNNsByVector
+  :: forall h r
+  .  Array Number
+  -> Int
+  -> Int
+  -> STAnnoy h
+  -> Eff (st :: ST h | r) (Array Int)
+
+-- | Returns number of (allocated!) elements in Annoy.
+foreign import getNItems
+  :: forall h r
+  .  STAnnoy h
+  -> Eff (st :: ST h | r) Int
+
+-- | Returns the distance between items at positions `i` and `j`. No bounds checks are performed.
+foreign import unsafeGetDistance
+  :: forall h r
+  .  Int
+  -> Int
+  -> STAnnoy h
+  -> Eff (st :: ST h | r) Number
