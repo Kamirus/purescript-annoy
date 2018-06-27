@@ -19,7 +19,7 @@ foreign import data STAnnoy :: Type -> Type -> Type
 
 build 
   :: forall s t
-  .  Nat s
+   . Nat s
   => Nat t
   => t
   -> (forall h. Eff (st :: ST h) (STAnnoy h s))
@@ -31,7 +31,7 @@ build trees m = runPure (runST (do
 
 new
   :: forall h r s
-  .  Nat s
+   . Nat s
   => s
   -> String
   -> Eff (st :: ST h | r) (STAnnoy h s)
@@ -39,7 +39,7 @@ new s metric = unsafeCoerce $ unsafeNewAnnoy (toInt s) metric
 
 push
   :: forall h r s
-  .  Nat s
+   . Nat s
   => Vec s Number
   -> STAnnoy h s
   -> Eff (st :: ST h | r) Unit
@@ -50,6 +50,6 @@ push v annoy = do
 
 unsafeFreeze
   :: forall h r s
-  .  STAnnoy h s
+   . STAnnoy h s
   -> Eff (st :: ST h | r) (Annoy s)
 unsafeFreeze = pure <<< (unsafeCoerce :: STAnnoy h s -> Annoy s)
