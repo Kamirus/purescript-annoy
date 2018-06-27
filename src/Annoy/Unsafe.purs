@@ -67,6 +67,16 @@ foreign import unsafeGetNNsByItem
   -> STAnnoy h
   -> Eff (st :: ST h | r) (Array Int)
 
+-- | Like `unsafeGetNNsByItem` but returns also distances
+foreign import unsafeGetNNsByItem_
+  :: forall h r
+  .  Int
+  -> Int
+  -> Int
+  -> STAnnoy h
+  -> Eff (st :: ST h | r) { neighbors :: Array Int
+                          , distances :: Array Int }
+
 -- | `unsafeGetNNsByVector v n search_k`
 -- | Like above but query by vector v instead of index.
 foreign import unsafeGetNNsByVector
@@ -76,6 +86,16 @@ foreign import unsafeGetNNsByVector
   -> Int
   -> STAnnoy h
   -> Eff (st :: ST h | r) (Array Int)
+
+-- | Like `unsafeGetNNsByVector` but returns also distances
+foreign import unsafeGetNNsByVector_
+  :: forall h r
+  .  Array Number
+  -> Int
+  -> Int
+  -> STAnnoy h
+  -> Eff (st :: ST h | r) { neighbors :: Array Int
+                          , distances :: Array Int }
 
 -- | Returns number of (allocated!) elements in Annoy.
 foreign import getNItems

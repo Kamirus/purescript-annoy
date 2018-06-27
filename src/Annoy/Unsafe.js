@@ -70,6 +70,18 @@ exports.unsafeGetNNsByItem = function(i) {
   };
 };
 
+exports.unsafeGetNNsByItem_ = function(i) {
+  return function(n) {
+    return function(search_k) {
+      return function(annoy) {
+        return function() {
+          return annoy.getNNsByItem(i, n, search_k, true);
+        };
+      };
+    };
+  };
+};
+
 exports.unsafeGetNNsByVector = function(v) {
   return function(n) {
     return function(search_k) {
@@ -82,29 +94,17 @@ exports.unsafeGetNNsByVector = function(v) {
   };
 };
 
-// exports.unsafeGetNNsByItem_ = function(i) {
-//   return function(n) {
-//     return function(search_k) {
-//       return function(annoy) {
-//         return function() {
-//           return annoy.getNNsByItem(i, n, search_k, true);
-//         };
-//       };
-//     };
-//   };
-// };
-
-// exports.unsafeGetNNsByVector_ = function(v) {
-//   return function(n) {
-//     return function(search_k) {
-//       return function(annoy) {
-//         return function() {
-//           return annoy.getNNsByVector(v, n, search_k, true);
-//         };
-//       };
-//     };
-//   };
-// };
+exports.unsafeGetNNsByVector_ = function(v) {
+  return function(n) {
+    return function(search_k) {
+      return function(annoy) {
+        return function() {
+          return annoy.getNNsByVector(v, n, search_k, true);
+        };
+      };
+    };
+  };
+};
 
 exports.getNItems = function(annoy) {
   return function() {
