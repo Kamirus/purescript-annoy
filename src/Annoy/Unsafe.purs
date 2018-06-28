@@ -14,7 +14,7 @@ foreign import unsafeNew
   :: forall h r
    . Int
   -> String
-  -> Eff (st :: ST h | r) (STAnnoy h)
+  -> Eff ( st :: ST h | r ) (STAnnoy h)
 
 -- | Inserts vector at given index. No checks for: not frozen `STAnnoy`, matching dimension, negative index.
 foreign import unsafeAddItem 
@@ -22,40 +22,40 @@ foreign import unsafeAddItem
    . Int 
   -> Array Number
   -> STAnnoy h
-  -> Eff (st :: ST h | r) Unit
+  -> Eff ( st :: ST h | r ) Unit
 
 -- | Builds a forest of given number of trees. After calling, no more items can be added.
 foreign import unsafeBuild
   :: forall h r
    . Int
   -> STAnnoy h
-  -> Eff (st :: ST h | r) Unit
+  -> Eff ( st :: ST h | r ) Unit
 
 -- | Saves the index to disk.
 foreign import save
   :: forall h r
    . String
   -> STAnnoy h
-  -> Eff (st :: ST h, fs :: FS | r) Boolean
+  -> Eff ( st :: ST h, fs :: FS | r ) Boolean
 
 -- | Loads an index from disk.
 foreign import load
   :: forall h r
    . String
   -> STAnnoy h
-  -> Eff (st :: ST h, fs :: FS | r) Boolean
+  -> Eff ( st :: ST h, fs :: FS | r ) Boolean
 
 foreign import unload
   :: forall h r
    . STAnnoy h
-  -> Eff (st :: ST h, fs :: FS | r) Unit
+  -> Eff ( st :: ST h, fs :: FS | r ) Unit
 
 -- | Returns vector under given index. No bounds checks are performed.
 foreign import unsafeGetItem
   :: forall h r
    . Int
   -> STAnnoy h
-  -> Eff (st :: ST h | r) (Array Number)
+  -> Eff ( st :: ST h | r ) (Array Number)
 
 -- | `unsafeGetNNsByItem i n search_k`
 -- | Returns `n` closest items to the `i`-th vector. Pass default -1 for `search_k`, for more info visit [original annoy](https://github.com/spotify/annoy). No bounds checks are performed.
@@ -65,7 +65,7 @@ foreign import unsafeGetNNsByItem
   -> Int
   -> Int
   -> STAnnoy h
-  -> Eff (st :: ST h | r) (Array Int)
+  -> Eff ( st :: ST h | r ) (Array Int)
 
 -- | Like `unsafeGetNNsByItem` but returns also distances
 foreign import unsafeGetNNsByItem_
@@ -74,7 +74,7 @@ foreign import unsafeGetNNsByItem_
   -> Int
   -> Int
   -> STAnnoy h
-  -> Eff (st :: ST h | r) { neighbors :: Array Int, distances :: Array Int }
+  -> Eff ( st :: ST h | r ) { neighbors :: Array Int, distances :: Array Int }
 
 -- | `unsafeGetNNsByVector v n search_k`
 -- | Like above but query by vector v instead of index.
@@ -84,7 +84,7 @@ foreign import unsafeGetNNsByVector
   -> Int
   -> Int
   -> STAnnoy h
-  -> Eff (st :: ST h | r) (Array Int)
+  -> Eff ( st :: ST h | r ) (Array Int)
 
 -- | Like `unsafeGetNNsByVector` but returns also distances
 foreign import unsafeGetNNsByVector_
@@ -93,13 +93,13 @@ foreign import unsafeGetNNsByVector_
   -> Int
   -> Int
   -> STAnnoy h
-  -> Eff (st :: ST h | r) { neighbors :: Array Int, distances :: Array Int }
+  -> Eff ( st :: ST h | r ) { neighbors :: Array Int, distances :: Array Int }
 
 -- | Returns number of (allocated!) elements in Annoy.
 foreign import getNItems
   :: forall h r
    . STAnnoy h
-  -> Eff (st :: ST h | r) Int
+  -> Eff ( st :: ST h | r ) Int
 
 -- | Returns the distance between items at positions `i` and `j`. No bounds checks are performed.
 foreign import unsafeGetDistance
@@ -107,4 +107,4 @@ foreign import unsafeGetDistance
    . Int
   -> Int
   -> STAnnoy h
-  -> Eff (st :: ST h | r) Number
+  -> Eff ( st :: ST h | r ) Number

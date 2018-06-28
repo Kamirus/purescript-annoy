@@ -22,7 +22,7 @@ build
    . Nat s
   => Nat t
   => t
-  -> (forall h. Eff (st :: ST h) (STAnnoy h s))
+  -> (forall h. Eff ( st :: ST h ) (STAnnoy h s))
   -> Annoy s
 build trees m = runPure (runST (do 
   a <- m
@@ -34,7 +34,7 @@ new
    . Nat s
   => s
   -> String
-  -> Eff (st :: ST h | r) (STAnnoy h s)
+  -> Eff ( st :: ST h | r ) (STAnnoy h s)
 new s metric = unsafeCoerce $ unsafeNew (toInt s) metric
 
 push
@@ -42,7 +42,7 @@ push
    . Nat s
   => Vec s Number
   -> STAnnoy h s
-  -> Eff (st :: ST h | r) Unit
+  -> Eff ( st :: ST h | r ) Unit
 push v annoy = do
   let a = unsafeCoerce annoy
   len <- getNItems a
@@ -51,5 +51,5 @@ push v annoy = do
 unsafeFreeze
   :: forall h r s
    . STAnnoy h s
-  -> Eff (st :: ST h | r) (Annoy s)
+  -> Eff ( st :: ST h | r ) (Annoy s)
 unsafeFreeze = pure <<< (unsafeCoerce :: STAnnoy h s -> Annoy s)
