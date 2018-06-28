@@ -2,11 +2,10 @@ module Annoy.Unsafe where
 
 import Prelude
 
+import Annoy.Types (STPrimAnnoy)
 import Control.Monad.Eff (Eff)
 import Control.Monad.ST (ST)
 import Node.FS (FS)
-
-foreign import data STPrimAnnoy :: Type -> Type
 
 -- | `unsafeNew f metric`
 -- | Creates new `STPrimAnnoy` that stores vector of `f` dimensions with `metric`. Does not validate input.

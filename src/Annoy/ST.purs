@@ -1,22 +1,18 @@
 module Annoy.ST
-  ( STAnnoy
-  , build
+  ( build
   , new
   , push
   ) where
 
 import Prelude
 
-import Annoy (Annoy)
+import Annoy.Types (Annoy, STAnnoy)
 import Annoy.Unsafe (getNItems, unsafeAddItem, unsafeBuild, unsafeNew)
 import Control.Monad.Eff (Eff, runPure)
 import Control.Monad.ST (ST, runST)
 import Data.Typelevel.Num (class Nat, toInt)
 import Data.Vec (Vec, toArray)
 import Unsafe.Coerce (unsafeCoerce)
-
--- | `STAnnoy h s` where s is allowed size of vectors
-foreign import data STAnnoy :: Type -> Type -> Type
 
 build
   :: forall s t
@@ -53,4 +49,4 @@ unsafeFreeze
   :: forall h r s
    . STAnnoy h s
   -> Eff ( st :: ST h | r ) (Annoy s)
-unsafeFreeze = pure <<< (unsafeCoerce :: STAnnoy h s -> Annoy s)
+unsafeFreeze = pure <<< unsafeCoerce
