@@ -2,7 +2,7 @@
 
 var Annoy = require('annoy');
 
-exports.unsafeNewAnnoy = function(f) {
+exports.unsafeNew = function(f) {
   return function(metric) {
     return function() {
       return new Annoy(f, metric);

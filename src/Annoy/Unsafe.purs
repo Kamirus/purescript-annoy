@@ -8,9 +8,9 @@ import Node.FS (FS)
 
 foreign import data STAnnoy :: Type -> Type
 
--- | `unsafeNewAnnoy f metric`
+-- | `unsafeNew f metric`
 -- | Creates new `STAnnoy` that stores vector of `f` dimensions with `metric`. Does not validate input.
-foreign import unsafeNewAnnoy
+foreign import unsafeNew
   :: forall h r
    . Int
   -> String
