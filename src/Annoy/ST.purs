@@ -1,8 +1,8 @@
 module Annoy.ST
-  ( build
+  ( STAnnoy
+  , build
   , new
   , push
-  , STAnnoy
   ) where
 
 import Prelude
@@ -15,9 +15,10 @@ import Data.Typelevel.Num (class Nat, toInt)
 import Data.Vec (Vec, toArray)
 import Unsafe.Coerce (unsafeCoerce)
 
+-- | `STAnnoy h s` where s is allowed size of vectors
 foreign import data STAnnoy :: Type -> Type -> Type
 
-build 
+build
   :: forall s t
    . Nat s
   => Nat t
