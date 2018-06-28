@@ -3,6 +3,7 @@
   "set": "df",
   "source": "https://github.com/lambdaterms-forks/package-sets.git",
   "depends": [
+    "test-unit",
     "sized-vectors",
     "typelevel",
     "node-fs",
