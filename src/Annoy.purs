@@ -6,7 +6,7 @@ module Annoy
 
 import Prelude
 
-import Annoy.Unsafe (STAnnoy, getNItems, unsafeGetItem)
+import Annoy.Unsafe (STPrimAnnoy, getNItems, unsafeGetItem)
 import Control.Monad.Eff (Eff, runPure)
 import Control.Monad.ST (ST, runST)
 import Data.Foldable (class Foldable)
@@ -16,7 +16,7 @@ import Data.Vec (Vec, fromArray)
 import Partial.Unsafe (unsafePartial)
 import Unsafe.Coerce (unsafeCoerce)
 
-toPrim :: forall s h. Nat s => Annoy s -> STAnnoy h
+toPrim :: forall s h. Nat s => Annoy s -> STPrimAnnoy h
 toPrim = unsafeCoerce
 
 unsafeFromArray :: forall a s. Nat s => Array a -> Vec s a
