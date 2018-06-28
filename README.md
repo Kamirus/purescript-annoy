@@ -12,10 +12,10 @@ PureScript bindings for [annoy-node](https://github.com/jimkang/annoy-node)
 - [x] safe: create from monadic action
 - [x] unsafe: include distances
 - [ ] tests
-- [ ] function overloading with typeclass?
-- [ ] prim annoy h, stannoy h s, annoy s?
-- [ ] annoy s len?
-- [ ] unsafeCoerce or more js?
+- [ ] Nat vs Int. Both
+- [ ] revert eff unsafe
+- [ ] publish
+- [ ] P2: len reference in STAnnoy
 
 
 # Credits
