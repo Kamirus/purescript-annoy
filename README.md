@@ -11,11 +11,12 @@ PureScript bindings for [annoy-node](https://github.com/jimkang/annoy-node)
 - [x] safe: vectors with typelevel length 
 - [x] safe: create from monadic action
 - [x] unsafe: include distances
-- [ ] tests
+- [ ] test: unsafe simple calls
+- [ ] test: Integration
 - [ ] Nat vs Int. Both
-- [ ] revert eff unsafe
 - [ ] publish
 - [ ] P2: len reference in STAnnoy
+- [ ] metric as type
 
 
 # Credits
