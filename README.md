@@ -7,14 +7,15 @@ PureScript bindings for [annoy-node](https://github.com/jimkang/annoy-node)
 
 
 # Task List
+- [ ] all pure annoy api
 - [ ] docs
-- [ ] metric as type
-- [ ] Nat vs Int. Both
 - [ ] P2: len reference in STAnnoy
 - [ ] publish
 - [ ] safe: new with 2D array
 - [ ] test: Integration
 - [ ] test: unsafe simple calls
+- [x] metric as type
+- [x] Nat vs Int. Both
 - [x] safe: create from monadic action
 - [x] safe: vectors with typelevel length 
 - [x] unsafe: include distances
