@@ -1,6 +1,10 @@
-module Annoy.Types where
-
-import Prelude
+module Annoy.Types
+  ( Annoy
+  , STAnnoy
+  , STPrimAnnoy
+  , Metric(..)
+  , strMetric
+  ) where
 
 -- | `STPrimAnnoy h` foreign type used in Unsafe module.
 foreign import data STPrimAnnoy :: Type -> Type
@@ -15,7 +19,7 @@ foreign import data STAnnoy :: Type -> Type -> Type
 
 data Metric = Angular | Manhattan | Euclidean
 
-instance showMetric :: Show Metric where
-  show Angular = "Angular"
-  show Manhattan = "Manhattan"
-  show Euclidean = "Euclidean"
+strMetric :: Metric -> String
+strMetric Angular = "Angular"
+strMetric Manhattan = "Manhattan"
+strMetric Euclidean = "Euclidean"

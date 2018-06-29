@@ -6,7 +6,7 @@ module Annoy.ST
 
 import Prelude
 
-import Annoy.Types (Annoy, Metric, STAnnoy)
+import Annoy.Types (Annoy, Metric, STAnnoy, strMetric)
 import Annoy.Unsafe (getNItems, unsafeAddItem, unsafeBuild, unsafeNew)
 import Control.Monad.Eff (Eff, runPure)
 import Control.Monad.ST (ST, runST)
@@ -54,7 +54,7 @@ new
   => s
   -> Metric
   -> Eff ( st :: ST h | r ) (STAnnoy h s)
-new s metric = unsafeCoerce $ unsafeNew (toInt s) $ show metric
+new s metric = unsafeCoerce $ unsafeNew (toInt s) $ strMetric metric
 
 -- | `push v annoy` adds vector `v` at index 'len' which is equal to the number of currently stored vectors
 push
