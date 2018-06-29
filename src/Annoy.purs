@@ -44,7 +44,7 @@ length a = runPure (runST (U.getNItems $ unsafeCoerce a))
 save :: forall s r. String -> Annoy s -> Eff ( fs :: FS | r ) Boolean
 save path a = runST (U.save path $ unsafeCoerce a)
 
--- load
+-- load :: String -> Eff ( fs :: FS | r ) (Maybe (Annoy s))
 
 -- nnsByItem
 

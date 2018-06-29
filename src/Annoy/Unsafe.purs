@@ -38,7 +38,7 @@ foreign import save
   -> Eff ( st :: ST h, fs :: FS | r ) Boolean
 
 -- | Loads an index from disk.
-foreign import load
+foreign import unsafeLoad
   :: forall h r
    . String
   -> STPrimAnnoy h

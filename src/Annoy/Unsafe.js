@@ -36,7 +36,7 @@ exports.save = function(path) {
   };
 };
 
-exports.load = function(path) {
+exports.unsafeLoad = function(path) {
   return function(annoy) {
     return function() {
       return annoy.load(path);
