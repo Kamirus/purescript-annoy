@@ -6,7 +6,7 @@ module Annoy.ST
 
 import Prelude
 
-import Annoy.Types (Annoy, STAnnoy)
+import Annoy.Types (Annoy, Metric, STAnnoy)
 import Annoy.Unsafe (getNItems, unsafeAddItem, unsafeBuild, unsafeNew)
 import Control.Monad.Eff (Eff, runPure)
 import Control.Monad.ST (ST, runST)
@@ -30,9 +30,9 @@ new
   :: forall h r s
    . Nat s
   => s
-  -> String
+  -> Metric
   -> Eff ( st :: ST h | r ) (STAnnoy h s)
-new s metric = unsafeCoerce $ unsafeNew (toInt s) metric
+new s metric = unsafeCoerce $ unsafeNew (toInt s) $ show metric
 
 push
   :: forall h r s
