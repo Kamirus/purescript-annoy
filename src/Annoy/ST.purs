@@ -2,6 +2,7 @@ module Annoy.ST
   ( build
   , new
   , push
+  , unsafeFreeze
   ) where
 
 import Prelude
