@@ -1,5 +1,6 @@
 module Annoy.ST
   ( build
+  , build_
   , new
   , push
   , unsafeFreeze
