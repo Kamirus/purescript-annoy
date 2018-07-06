@@ -1,4 +1,4 @@
-module Test.Unsafe where
+module Test.Units.Unsafe where
 
 import Prelude
 
@@ -10,7 +10,7 @@ import Test.Unit (TestF, suite, test)
 import Test.Unit.Assert as A
 
 testUnsafe :: forall t. Free (TestF t) Unit
-testUnsafe =
+testUnsafe = suite "Unsafe" do
   suite "simple calls" do
     test "new add get" do
       let v = [0.25, 0.5, 0.25]

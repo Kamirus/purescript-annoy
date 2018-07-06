@@ -57,7 +57,7 @@ foreign import unsafeGetItem
   -> Eff ( st :: ST h | r ) (Array Number)
 
 -- | `unsafeGetNNsByItem i n search_k`
--- | Returns `n` closest items to the `i`-th vector. Pass default -1 for `search_k`, for more info visit [original annoy](https://github.com/spotify/annoy). No bounds checks are performed.
+-- | Returns `n` closest items to the `i`-th vector. No bounds checks are performed.
 foreign import unsafeGetNNsByItem
   :: forall h r
    . Int

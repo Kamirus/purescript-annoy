@@ -1,26 +1,24 @@
-module Test.ST where
+module Test.Units.ST where
 
 import Prelude
 
 import Annoy (unsafeGet)
-import Annoy.ST (build, build_, new, push)
+import Annoy.ST (build, new, push)
 import Annoy.Types (Annoy, Metric(..))
 import Control.Monad.Free (Free)
-import Data.Foldable (traverse_)
-import Data.Maybe (isNothing)
 import Data.Typelevel.Num (class Pos, D2, d1, d2)
 import Data.Vec (Vec, empty, (+>))
 import Test.Unit (TestF, suite, test)
-import Test.Unit.Assert (assert, equal)
-import Unsafe.Coerce (unsafeCoerce)
+import Test.Unit.Assert (equal)
 
 testST :: forall t. Free (TestF t) Unit
-testST = suite "creations" do 
-  test "new 3xpush build 3xget" do
-    let a = newPush3Build d1
-    equal v0 $ unsafeGet 0 a
-    equal v1 $ unsafeGet 1 a
-    equal v2 $ unsafeGet 2 a
+testST = suite "ST" do
+  suite "creations" do 
+    test "new 3xpush build 3xget" do
+      let a = newPush3Build d1
+      equal v0 $ unsafeGet 0 a
+      equal v1 $ unsafeGet 1 a
+      equal v2 $ unsafeGet 2 a
 
 v0 :: Vec D2 Number
 v0 = 1.0 +> 2.0 +> empty
