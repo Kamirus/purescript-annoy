@@ -9,21 +9,49 @@ module Annoy
   -- , nnsByVec
   -- , nnsByVec_
   -- , distance
+  , fromVectors
+  , fromVectors_
   ) where
 
 import Prelude
 
-import Annoy.ST (new, unsafeFreeze)
+import Annoy.ST (build_, new, push, unsafeFreeze)
 import Annoy.Types (Annoy, Metric)
 import Annoy.Unsafe as U
 import Control.Monad.Eff (Eff, runPure)
 import Control.Monad.ST (runST)
+import Data.Foldable (class Foldable, traverse_)
 import Data.Maybe (Maybe(..), fromJust)
-import Data.Typelevel.Num (class Nat)
+import Data.Typelevel.Num (class Nat, class Pos, toInt)
+import Data.Typelevel.Undefined (undefined)
 import Data.Vec (Vec, fromArray)
 import Node.FS (FS)
 import Partial.Unsafe (unsafePartial)
 import Unsafe.Coerce (unsafeCoerce)
+
+fromVectors
+  :: forall s t f
+   . Nat s
+  => Foldable f
+  => Pos t
+  => t
+  -> Metric
+  -> f (Vec s Number)
+  -> Annoy s
+fromVectors trees metric vectors = unsafePartial $ fromJust $ fromVectors_ (toInt trees) metric vectors
+
+fromVectors_
+  :: forall s f
+   . Nat s
+  => Foldable f
+  => Int
+  -> Metric
+  -> f (Vec s Number)
+  -> Maybe (Annoy s)
+fromVectors_ trees metric vectors = build_ trees (do
+  a <- new (undefined :: s) metric
+  traverse_ (\v -> push v a) vectors
+  pure a)
 
 -- | `get i annoy` returns `i`-th vector. Performs bounds check.
 get :: forall s. Nat s => Int -> Annoy s -> Maybe (Vec s Number)
