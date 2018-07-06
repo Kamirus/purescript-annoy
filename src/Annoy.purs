@@ -21,10 +21,10 @@ import Annoy.Unsafe as U
 import Control.Monad.Eff (Eff, runPure)
 import Control.Monad.ST (runST)
 import Data.Foldable (class Foldable, traverse_)
+import Data.Foreign.NullOrUndefined (undefined)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Typelevel.Num (class Nat, class Pos, toInt)
-import Data.Typelevel.Undefined (undefined)
-import Data.Vec (Vec, fromArray)
+import Data.Vec (Vec, fromArray, toArray)
 import Node.FS (FS)
 import Partial.Unsafe (unsafePartial)
 import Unsafe.Coerce (unsafeCoerce)
@@ -49,7 +49,7 @@ fromVectors_
   -> f (Vec s Number)
   -> Maybe (Annoy s)
 fromVectors_ trees metric vectors = build_ trees (do
-  a <- new (undefined :: s) metric
+  a <- new (unsafeCoerce unit :: s) metric
   traverse_ (\v -> push v a) vectors
   pure a)
 
@@ -90,11 +90,22 @@ unsafeLoad path s metric = runST (do
 
 -- nnsByItem_
 
--- nnsByVec
+nnsByVec :: forall s r. Nat s => Vec s Number -> Int -> ({ searchK :: Int } -> { searchK :: Int }) -> Annoy s -> Array Int
+nnsByVec v n update a = 
+  runPure (runST (U.unsafeGetNNsByVector (toArray v) n ops.searchK (unsafeCoerce a)))
+  where
+  ops :: { searchK :: Int }
+  ops = update { searchK: unsafeCoerce undefined }
 
 -- nnsByVec_
 
--- distance
+distance :: forall s. Nat s => Int -> Int -> Annoy s -> Maybe Number
+distance i j a = if i < 0 || j < 0 || i >= n || j >= n then Nothing
+  else Just $ unsafeDistance i j a
+  where n = length a
+
+unsafeDistance :: forall s. Nat s => Int -> Int -> Annoy s -> Number
+unsafeDistance i j a = runPure (runST (U.unsafeGetDistance i j $ unsafeCoerce a))
 
 unsafeFromArray :: forall a s. Nat s => Array a -> Vec s a
 unsafeFromArray arr = unsafePartial $ fromJust $ fromArray arr
