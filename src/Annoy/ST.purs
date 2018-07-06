@@ -38,7 +38,7 @@ build trees m = unsafePartial $ fromJust $ build_ (toInt trees) m
 
 -- | Similar to `build` but `trees` argument is an Int, so return type is Maybe
 build_
-  :: forall s t
+  :: forall s
    . Nat s
   => Int
   -> (forall h. Eff ( st :: ST h ) (STAnnoy h s))
