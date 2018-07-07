@@ -1,0 +1,34 @@
+{
+  "name": "purescript-annoy",
+  "homepage": "https://github.com/Kamirus/purescript-annoy",
+  "authors": [
+    "Kamirus <listopadkamil@gmail.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Kamirus/purescript-annoy.git"
+  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "purescript-test-unit": "^13.0.0",
+    "purescript-psci-support": "^3.0.0"
+  },
+  "dependencies": {
+    "purescript-sized-vectors": "^2.2.0",
+    "purescript-typelevel": "^3.0.0",
+    "purescript-node-fs": "^4.0.1",
+    "purescript-st": "^3.0.0",
+    "purescript-foreign-generic": "^5.0.1",
+    "purescript-foreign": "^4.0.1",
+    "purescript-console": "^3.0.0",
+    "purescript-eff": "^3.2.0",
+    "purescript-prelude": "^3.1.1"
+  }
+}
