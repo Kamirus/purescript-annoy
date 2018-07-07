@@ -2,17 +2,18 @@ module Test.Integration where
 
 import Prelude
 
-import Annoy (fromVectors, length, save, unsafeGet, unsafeLoad)
+import Annoy (distance, fromVectors, length, nnsByVec, save, unsafeGet, unsafeLoad)
 import Annoy.Types (Annoy, Metric(..))
 import Control.Monad.Aff (Aff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Free (Free)
 import Data.Array ((..))
+import Data.Array as Array
 import Data.Foldable (traverse_)
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), isJust)
 import Data.Typelevel.Num (class Nat, class Pos, d10, d5)
-import Data.Vec (replicate)
+import Data.Vec (empty, replicate, (+>))
 import Node.FS (FS)
 import Test.Unit (TestF, failure, suite, test)
 import Test.Unit.Assert (assert, equal)
@@ -22,15 +23,20 @@ path = ".path.txt"
 
 integration :: forall r. Free (TestF ( fs :: FS | r )) Unit
 integration = suite "integration" $ do
-  test "save a; a' <- load; a == a'" $ do
+  test "save a; a' <- load; a == a'; nnsByVec (w/o searchK); distance" $ do
     let ops = { trees: d10, size: d5, metric: Angular }
-    let a = createByReplicate ops $ 1 .. 100
+    let a = createByReplicate ops $ 1 .. 500
     isSaved <- liftEff $ save path a
-    assert "is saved" isSaved
+    assert "save failed" isSaved
     maybeA <- liftEff $ unsafeLoad path ops.size ops.metric
     case maybeA of
       Nothing -> failure "load failed"
-      Just a' -> equalAnnoys a a'
+      Just a' -> do
+        equalAnnoys a a'
+        let v = (0.0 +> 0.001 +> 0.002 +> 0.003 +> 0.004 +> empty)
+        equal 10 $ Array.length $ nnsByVec v 10 id a'
+        equal 10 $ Array.length $ nnsByVec v 10 (_ { searchK = 1 }) a'
+        assert "distance not calculated" $ isJust $ distance 0 5 a
 
 equalAnnoys :: forall s e. Nat s => Annoy s -> Annoy s -> Aff e Unit
 equalAnnoys a a' = if n /= length a' - 1 then failure "lengths not equal"
@@ -47,5 +53,5 @@ createByReplicate
   -> Array Int
   -> Annoy s
 createByReplicate { trees, size, metric } arr =
-  let vs = arr # map (replicate size <<< toNumber) in
+  let vs = arr # map (replicate size <<< (_ / 100.0) <<< toNumber) in
   fromVectors trees metric vs

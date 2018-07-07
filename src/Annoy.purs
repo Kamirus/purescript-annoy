@@ -6,9 +6,10 @@ module Annoy
   , unsafeLoad
   -- , nnsByItem
   -- , nnsByItem_
-  -- , nnsByVec
+  , nnsByVec
   -- , nnsByVec_
-  -- , distance
+  , distance
+  , unsafeDistance
   , fromVectors
   , fromVectors_
   ) where
