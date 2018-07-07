@@ -16,9 +16,9 @@ testST = suite "ST" do
   suite "creations" do 
     test "new 3xpush build 3xget" do
       let a = newPush3Build d1
-      equal v0 $ unsafeGet 0 a
-      equal v1 $ unsafeGet 1 a
-      equal v2 $ unsafeGet 2 a
+      equal v0 $ unsafeGet a 0
+      equal v1 $ unsafeGet a 1
+      equal v2 $ unsafeGet a 2
 
 v0 :: Vec D2 Number
 v0 = 1.0 +> 2.0 +> empty
@@ -32,8 +32,8 @@ v2 = 5.0 +> 6.0 +> empty
 newPush3Build :: forall t. Pos t => t -> Annoy D2
 newPush3Build trees = build { trees } (do
   a <- new { size: d2 , metric: Manhattan }
-  push v0 a
-  push v1 a
-  push v2 a
+  push a v0
+  push a v1
+  push a v2
   pure a)
 

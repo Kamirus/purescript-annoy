@@ -19,5 +19,5 @@ testUnsafe = suite "Unsafe" do
   where
     newAddGet v = runPure (runST (do 
       a <- unsafeNew 3 ""
-      unsafeAddItem 0 v a
-      unsafeGetItem 0 a))
+      unsafeAddItem a 0 v
+      unsafeGetItem a 0))

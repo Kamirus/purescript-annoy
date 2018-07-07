@@ -53,115 +53,112 @@ fromVectors_
   -> Maybe (Annoy s)
 fromVectors_ ops@{ metric } vectors = build_ ops (do
   a <- new { size: (unsafeCoerce unit :: s) , metric }
-  traverse_ (\v -> push v a) vectors
+  traverse_ (\v -> push a v) vectors
   pure a)
 
--- | `get i annoy` returns `i`-th vector. Performs bounds check.
-get :: forall s. Nat s => Int -> Annoy s -> Maybe (Vec s Number)
-get i a = 
+-- | `get annoy i` returns `i`-th vector. Performs bounds check.
+get :: forall s. Nat s => Annoy s -> Int -> Maybe (Vec s Number)
+get a i = 
   if 0 <= i && i < length a
-  then Just $ unsafeGet i a
+  then Just $ unsafeGet a i
   else Nothing
 
 -- | Similar to `get` but no bounds checks are performed.
-unsafeGet :: forall s. Nat s => Int -> Annoy s -> Vec s Number
-unsafeGet i a = unsafeFromArray $ runPure (runST (U.unsafeGetItem i $ unsafeCoerce a))
+unsafeGet :: forall s. Nat s => Annoy s -> Int -> Vec s Number
+unsafeGet a i = unsafeFromArray $ runPure (runST (U.unsafeGetItem (unsafeCoerce a) i))
 
 -- | `length annoy` returns number of stored vectors
 length :: forall s. Annoy s -> Int
 length a = runPure (runST (U.getNItems $ unsafeCoerce a))
 
--- | `save path annoy` dumps annoy to the file. Boolean indicates succes or failure.
-save :: forall s r. String -> Annoy s -> Eff ( fs :: FS | r ) Boolean
-save path a = runST (U.save path $ unsafeCoerce a)
+-- | `save annoy path` dumps annoy to the file. Boolean indicates succes or failure.
+save :: forall s r. Annoy s -> String -> Eff ( fs :: FS | r ) Boolean
+save a path = runST (U.save (unsafeCoerce a) path)
 
--- | `unsafeLoad path { size , metric }` creates `STAnnoy` using `size` and `metric`, then loads annoy using `path`
+-- | `unsafeLoad { size , metric } path` creates `STAnnoy` using `size` and `metric`, then loads annoy using `path`
 -- | Unsafe aspect is that it does not check loaded vector sizes against `size`
 unsafeLoad
   :: forall r s o
    . Nat s
-  => String
-  -> { size :: s , metric :: Metric | o }
+  => { size :: s , metric :: Metric | o }
+  -> String
   -> Eff ( fs :: FS | r ) (Maybe (Annoy s))
-unsafeLoad path ops = runST (do
+unsafeLoad ops path = runST (do
   stAnnoy <- new ops
-  isOk <- U.unsafeLoad path $ unsafeCoerce stAnnoy
+  isOk <- U.unsafeLoad (unsafeCoerce stAnnoy) path
   if isOk then Just <$> unsafeFreeze stAnnoy else pure Nothing)
 
--- | `nnsByItem i n update a`
+-- | `nnsByItem a i n update`
 -- | Works like `nnsByVec`, but requires index instead of vector
 nnsByItem
   :: forall s
    . Nat s
-  => Int
+  => Annoy s
+  -> Int
   -> Int
   -> ({ searchK :: Int } -> { searchK :: Int })
-  -> Annoy s
   -> Maybe (Array Int)
-nnsByItem i n update a = nnsByVec <$> (get i a) <@> n <@> update <@> a
+nnsByItem a i n update = nnsByVec a <$> (get a i) <@> n <@> update
 
--- | `nnsByItem_ i n update a`
+-- | `nnsByItem_ a i n update`
 -- | Works like `nnsByVec_`, but requires index instead of vector
 nnsByItem_
   :: forall s
    . Nat s
-  => Int
+  => Annoy s
+  -> Int
   -> Int
   -> ({ searchK :: Int } -> { searchK :: Int })
-  -> Annoy s
   -> Maybe { neighbors :: Array Int , distances :: Array Int }
-nnsByItem_ i n update a = nnsByVec_ <$> (get i a) <@> n <@> update <@> a
+nnsByItem_ a i n update = nnsByVec_ a <$> (get a i) <@> n <@> update
 
--- | `nnsByVec v n update a`
+-- | `nnsByVec a v n update`
 -- | Returns `n` closest items to the `v` vector. `update` is used to set **search_k** parameter.
--- | `nnsByVec v n id a` to use default `searchK`
--- | `nnsByVec v n (_ { searchK = 123 }) a` to set `searchK`
+-- | `nnsByVec a v n id` to use default `searchK`
+-- | `nnsByVec a v n (_ { searchK = 123 })` to set `searchK`
 nnsByVec
   :: forall s
    . Nat s
-  => Vec s Number
+  => Annoy s
+  -> Vec s Number
   -> Int
   -> ({ searchK :: Int } -> { searchK :: Int })
-  -> Annoy s
   -> Array Int
 nnsByVec = _nnsByVec U.unsafeGetNNsByVector
 
--- | `nnsByVec_ v n update a`
--- | Returns `n` closest items to the `v` vector with distances. `update` is used to set **search_k** parameter.
--- | `nnsByVec_ v n id a` to use default `searchK`
--- | `nnsByVec_ v n (_ { searchK = 123 }) a` to set `searchK`
+-- | Works like `nnsByVec` but also returns distances
 nnsByVec_
   :: forall s
    . Nat s
-  => Vec s Number
-  -> Int ->
-  ({ searchK :: Int } -> { searchK :: Int })
-  -> Annoy s
+  => Annoy s
+  -> Vec s Number
+  -> Int
+  -> ({ searchK :: Int } -> { searchK :: Int })
   -> { neighbors :: Array Int , distances :: Array Int }
 nnsByVec_ = _nnsByVec U.unsafeGetNNsByVector_
 
 _nnsByVec
   :: forall s a
    . Nat s
-  => (forall h r. Array Number -> Int -> Int -> STPrimAnnoy h -> Eff ( st :: ST h | r ) a)
+  => (forall h r. STPrimAnnoy h -> Array Number -> Int -> Int -> Eff ( st :: ST h | r ) a)
+  -> Annoy s
   -> Vec s Number
   -> Int
   -> ({ searchK :: Int } -> { searchK :: Int })
-  -> Annoy s
   -> a
-_nnsByVec f v n update a = 
-  runPure (runST (f (toArray v) n ops.searchK (unsafeCoerce a)))
+_nnsByVec f a v n update = 
+  runPure (runST (f (unsafeCoerce a) (toArray v) n ops.searchK))
   where
   ops :: { searchK :: Int }
   ops = update { searchK: unsafeCoerce undefined }
 
-distance :: forall s. Nat s => Int -> Int -> Annoy s -> Maybe Number
-distance i j a = if i < 0 || j < 0 || i >= n || j >= n then Nothing
-  else Just $ unsafeDistance i j a
+distance :: forall s. Nat s => Annoy s -> Int -> Int -> Maybe Number
+distance a i j = if i < 0 || j < 0 || i >= n || j >= n then Nothing
+  else Just $ unsafeDistance a i j
   where n = length a
 
-unsafeDistance :: forall s. Nat s => Int -> Int -> Annoy s -> Number
-unsafeDistance i j a = runPure (runST (U.unsafeGetDistance i j $ unsafeCoerce a))
+unsafeDistance :: forall s. Nat s => Annoy s -> Int -> Int -> Number
+unsafeDistance a i j = runPure (runST (U.unsafeGetDistance (unsafeCoerce a) i j))
 
 unsafeFromArray :: forall a s. Nat s => Array a -> Vec s a
 unsafeFromArray arr = unsafePartial $ fromJust $ fromArray arr

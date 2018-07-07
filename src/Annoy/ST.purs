@@ -46,7 +46,7 @@ build_
 build_ { trees } m = if trees < 1 then Nothing
   else Just $ runPure (runST (do 
   a <- m
-  unsafeBuild trees $ unsafeCoerce a
+  unsafeBuild (unsafeCoerce a) trees
   unsafeFreeze a))
 
 -- | `new { size , metric }` creates mutable annoy that stores vectors of `size` and uses given `metric`
@@ -57,17 +57,17 @@ new
   -> Eff ( st :: ST h | r ) (STAnnoy h s)
 new { size , metric } = unsafeCoerce $ unsafeNew (toInt size) $ strMetric metric
 
--- | `push v annoy` adds vector `v` at index 'len' which is equal to the number of currently stored vectors
+-- | `push annoy v` adds vector `v` at index 'len' which is equal to the number of currently stored vectors
 push
   :: forall h r s
    . Nat s
-  => Vec s Number
-  -> STAnnoy h s
+  => STAnnoy h s
+  -> Vec s Number
   -> Eff ( st :: ST h | r ) Unit
-push v annoy = do
+push annoy v = do
   let a = unsafeCoerce annoy
   len <- getNItems a
-  unsafeAddItem len (toArray v) a
+  unsafeAddItem a len (toArray v)
 
 unsafeFreeze
   :: forall h r s

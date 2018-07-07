@@ -18,30 +18,30 @@ foreign import unsafeNew
 -- | Inserts vector at given index. No checks for: not frozen `STPrimAnnoy`, matching dimension, negative index.
 foreign import unsafeAddItem 
   :: forall h r
-   . Int 
+   . STPrimAnnoy h
+  -> Int
   -> Array Number
-  -> STPrimAnnoy h
   -> Eff ( st :: ST h | r ) Unit
 
 -- | Builds a forest of given number of trees. After calling, no more items can be added.
 foreign import unsafeBuild
   :: forall h r
-   . Int
-  -> STPrimAnnoy h
+   . STPrimAnnoy h
+  -> Int
   -> Eff ( st :: ST h | r ) Unit
 
 -- | Saves the index to disk.
 foreign import save
   :: forall h r
-   . String
-  -> STPrimAnnoy h
+   . STPrimAnnoy h
+  -> String
   -> Eff ( st :: ST h, fs :: FS | r ) Boolean
 
 -- | Loads an index from disk.
 foreign import unsafeLoad
   :: forall h r
-   . String
-  -> STPrimAnnoy h
+   . STPrimAnnoy h
+  -> String
   -> Eff ( st :: ST h, fs :: FS | r ) Boolean
 
 foreign import unload
@@ -52,46 +52,46 @@ foreign import unload
 -- | Returns vector under given index. No bounds checks are performed.
 foreign import unsafeGetItem
   :: forall h r
-   . Int
-  -> STPrimAnnoy h
+   . STPrimAnnoy h
+  -> Int
   -> Eff ( st :: ST h | r ) (Array Number)
 
--- | `unsafeGetNNsByItem i n search_k`
+-- | `unsafeGetNNsByItem a i n search_k`
 -- | Returns `n` closest items to the `i`-th vector. No bounds checks are performed.
 foreign import unsafeGetNNsByItem
   :: forall h r
-   . Int
+   . STPrimAnnoy h
   -> Int
   -> Int
-  -> STPrimAnnoy h
+  -> Int
   -> Eff ( st :: ST h | r ) (Array Int)
 
 -- | Like `unsafeGetNNsByItem` but returns also distances
 foreign import unsafeGetNNsByItem_
   :: forall h r
-   . Int
+   . STPrimAnnoy h
   -> Int
   -> Int
-  -> STPrimAnnoy h
+  -> Int
   -> Eff ( st :: ST h | r ) { neighbors :: Array Int, distances :: Array Int }
 
--- | `unsafeGetNNsByVector v n search_k`
+-- | `unsafeGetNNsByVector a v n search_k`
 -- | Like above but query by vector v instead of index.
 foreign import unsafeGetNNsByVector
   :: forall h r
-   . Array Number
+   . STPrimAnnoy h
+  -> Array Number
   -> Int
   -> Int
-  -> STPrimAnnoy h
   -> Eff ( st :: ST h | r ) (Array Int)
 
 -- | Like `unsafeGetNNsByVector` but returns also distances
 foreign import unsafeGetNNsByVector_
   :: forall h r
-   . Array Number
+   . STPrimAnnoy h
+  -> Array Number
   -> Int
   -> Int
-  -> STPrimAnnoy h
   -> Eff ( st :: ST h | r ) { neighbors :: Array Int, distances :: Array Int }
 
 -- | Returns number of (allocated!) elements in Annoy.
@@ -103,7 +103,7 @@ foreign import getNItems
 -- | Returns the distance between items at positions `i` and `j`. No bounds checks are performed.
 foreign import unsafeGetDistance
   :: forall h r
-   . Int
+   . STPrimAnnoy h
   -> Int
-  -> STPrimAnnoy h
+  -> Int
   -> Eff ( st :: ST h | r ) Number

@@ -10,9 +10,9 @@ exports.unsafeNew = function(f) {
   };
 };
 
-exports.unsafeAddItem = function(i) {
-  return function(v) {
-    return function(annoy) {
+exports.unsafeAddItem = function(annoy) {
+  return function(i) {
+    return function(v) {
       return function() {
         annoy.addItem(i, v);
       };
@@ -20,24 +20,24 @@ exports.unsafeAddItem = function(i) {
   };
 };
 
-exports.unsafeBuild = function(n_trees) {
-  return function(annoy) {
+exports.unsafeBuild = function(annoy) {
+  return function(n_trees) {
     return function() {
       annoy.build(n_trees);
     };
   };
 };
 
-exports.save = function(path) {
-  return function(annoy) {
+exports.save = function(annoy) {
+  return function(path) {
     return function() {
       return annoy.save(path);
     };
   };
 };
 
-exports.unsafeLoad = function(path) {
-  return function(annoy) {
+exports.unsafeLoad = function(annoy) {
+  return function(path) {
     return function() {
       return annoy.load(path);
     };
@@ -50,30 +50,30 @@ exports.unload = function(annoy) {
   };
 };
 
-exports.unsafeGetItem = function(i) {
-  return function(annoy) {
+exports.unsafeGetItem = function(annoy) {
+  return function(i) {
     return function() {
       return annoy.getItem(i);
     };
   };
 };
 
-exports.unsafeGetNNsByItem = function(i) {
-  return function(n) {
-    return function(search_k) {
-      return function(annoy) {
+exports.unsafeGetNNsByItem = function(annoy) {
+  return function(i) {
+    return function(n) {
+      return function(search_k) {
         return function() {
-          return annoy.getNNsByItem(i, n, search_k, false);
+            return annoy.getNNsByItem(i, n, search_k, false);
         };
-      };
+        };
     };
   };
 };
 
-exports.unsafeGetNNsByItem_ = function(i) {
-  return function(n) {
-    return function(search_k) {
-      return function(annoy) {
+exports.unsafeGetNNsByItem_ = function(annoy) {
+  return function(i) {
+    return function(n) {
+      return function(search_k) {
         return function() {
           return annoy.getNNsByItem(i, n, search_k, true);
         };
@@ -82,10 +82,10 @@ exports.unsafeGetNNsByItem_ = function(i) {
   };
 };
 
-exports.unsafeGetNNsByVector = function(v) {
-  return function(n) {
-    return function(search_k) {
-      return function(annoy) {
+exports.unsafeGetNNsByVector = function(annoy) {
+  return function(v) {
+    return function(n) {
+      return function(search_k) {
         return function() {
           return annoy.getNNsByVector(v, n, search_k, false);
         };
@@ -94,10 +94,10 @@ exports.unsafeGetNNsByVector = function(v) {
   };
 };
 
-exports.unsafeGetNNsByVector_ = function(v) {
-  return function(n) {
-    return function(search_k) {
-      return function(annoy) {
+exports.unsafeGetNNsByVector_ = function(annoy) {
+  return function(v) {
+    return function(n) {
+      return function(search_k) {
         return function() {
           return annoy.getNNsByVector(v, n, search_k, true);
         };
@@ -112,9 +112,9 @@ exports.getNItems = function(annoy) {
   };
 };
 
-exports.unsafeGetDistance = function(i) {
-  return function(j) {
-    return function(annoy) {
+exports.unsafeGetDistance = function(annoy) {
+  return function(i) {
+    return function(j) {
       return function() {
         return annoy.getDistance(i, j);
       };
