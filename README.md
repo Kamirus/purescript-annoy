@@ -4,6 +4,7 @@ PureScript bindings for [annoy-node](https://github.com/jimkang/annoy-node)
 
 Please refer to [original annoy](https://github.com/spotify/annoy) for any additional information
 
+[Docs published on Pursuit](https://pursuit.purescript.org/packages/purescript-annoy)
 
 ## Modules:
 - **Annoy.Unsafe** - Direct bindings, foundation for other modules. It is better to avoid using functions from this module.
