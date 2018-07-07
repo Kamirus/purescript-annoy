@@ -30,6 +30,8 @@ import Node.FS (FS)
 import Partial.Unsafe (unsafePartial)
 import Unsafe.Coerce (unsafeCoerce)
 
+-- | `fromVectors options@{ trees , metric } vectors`
+-- | Creates new Annoy with `metric`, adds given vectors and executes `build` using `trees`.
 fromVectors
   :: forall s t f o
    . Nat s
@@ -41,6 +43,7 @@ fromVectors
 fromVectors ops vectors = unsafePartial $ fromJust $
   fromVectors_ (ops { trees = toInt ops.trees }) vectors
 
+-- | Similar to `fromVectors` but `trees` :: Int.
 fromVectors_
   :: forall s f o
    . Nat s
