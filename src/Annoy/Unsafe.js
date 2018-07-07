@@ -65,7 +65,7 @@ exports.unsafeGetNNsByItem = function(annoy) {
         return function() {
             return annoy.getNNsByItem(i, n, search_k, false);
         };
-        };
+      };
     };
   };
 };
