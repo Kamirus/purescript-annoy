@@ -4,10 +4,10 @@ module Annoy
   , length
   , save
   , unsafeLoad
-  -- , nnsByItem
-  -- , nnsByItem_
+  , nnsByItem
+  , nnsByItem_
   , nnsByVec
-  -- , nnsByVec_
+  , nnsByVec_
   , distance
   , unsafeDistance
   , fromVectors
@@ -17,10 +17,10 @@ module Annoy
 import Prelude
 
 import Annoy.ST (build_, new, push, unsafeFreeze)
-import Annoy.Types (Annoy, Metric)
+import Annoy.Types (Annoy, Metric, STPrimAnnoy)
 import Annoy.Unsafe as U
 import Control.Monad.Eff (Eff, runPure)
-import Control.Monad.ST (runST)
+import Control.Monad.ST (ST, runST)
 import Data.Foldable (class Foldable, traverse_)
 import Data.Foreign.NullOrUndefined (undefined)
 import Data.Maybe (Maybe(..), fromJust)
@@ -87,18 +87,72 @@ unsafeLoad path s metric = runST (do
   isOk <- U.unsafeLoad path $ unsafeCoerce stAnnoy
   if isOk then Just <$> unsafeFreeze stAnnoy else pure Nothing)
 
--- nnsByItem
+-- | `nnsByItem i n update a`
+-- | Works like `nnsByVec`, but requires index instead of vector
+nnsByItem
+  :: forall s
+   . Nat s
+  => Int
+  -> Int
+  -> ({ searchK :: Int } -> { searchK :: Int })
+  -> Annoy s
+  -> Maybe (Array Int)
+nnsByItem i n update a = nnsByVec <$> (get i a) <@> n <@> update <@> a
 
--- nnsByItem_
+-- | `nnsByItem_ i n update a`
+-- | Works like `nnsByVec_`, but requires index instead of vector
+nnsByItem_
+  :: forall s
+   . Nat s
+  => Int
+  -> Int
+  -> ({ searchK :: Int } -> { searchK :: Int })
+  -> Annoy s
+  -> Maybe { neighbors :: Array Int , distances :: Array Int }
+nnsByItem_ i n update a = nnsByVec_ <$> (get i a) <@> n <@> update <@> a
 
-nnsByVec :: forall s r. Nat s => Vec s Number -> Int -> ({ searchK :: Int } -> { searchK :: Int }) -> Annoy s -> Array Int
-nnsByVec v n update a = 
-  runPure (runST (U.unsafeGetNNsByVector (toArray v) n ops.searchK (unsafeCoerce a)))
+-- | `nnsByVec v n update a`
+-- | Returns `n` closest items to the `v` vector. `update` is used to set **search_k** parameter.
+-- | `nnsByVec v n id a` to use default `searchK`
+-- | `nnsByVec v n (_ { searchK = 123 }) a` to set `searchK`
+nnsByVec
+  :: forall s
+   . Nat s
+  => Vec s Number
+  -> Int
+  -> ({ searchK :: Int } -> { searchK :: Int })
+  -> Annoy s
+  -> Array Int
+nnsByVec = _nnsByVec U.unsafeGetNNsByVector
+
+-- | `nnsByVec_ v n update a`
+-- | Returns `n` closest items to the `v` vector with distances. `update` is used to set **search_k** parameter.
+-- | `nnsByVec_ v n id a` to use default `searchK`
+-- | `nnsByVec_ v n (_ { searchK = 123 }) a` to set `searchK`
+nnsByVec_
+  :: forall s
+   . Nat s
+  => Vec s Number
+  -> Int ->
+  ({ searchK :: Int } -> { searchK :: Int })
+  -> Annoy s
+  -> { neighbors :: Array Int , distances :: Array Int }
+nnsByVec_ = _nnsByVec U.unsafeGetNNsByVector_
+
+_nnsByVec
+  :: forall s a
+   . Nat s
+  => (forall h r. Array Number -> Int -> Int -> STPrimAnnoy h -> Eff ( st :: ST h | r ) a)
+  -> Vec s Number
+  -> Int
+  -> ({ searchK :: Int } -> { searchK :: Int })
+  -> Annoy s
+  -> a
+_nnsByVec f v n update a = 
+  runPure (runST (f (toArray v) n ops.searchK (unsafeCoerce a)))
   where
   ops :: { searchK :: Int }
   ops = update { searchK: unsafeCoerce undefined }
-
--- nnsByVec_
 
 distance :: forall s. Nat s => Int -> Int -> Annoy s -> Maybe Number
 distance i j a = if i < 0 || j < 0 || i >= n || j >= n then Nothing
