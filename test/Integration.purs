@@ -29,7 +29,7 @@ integration = suite "integration" $ do
     let a = createByReplicate ops $ 1 .. 500
     isSaved <- liftEff $ save path a
     assert "save failed" isSaved
-    maybeA <- liftEff $ unsafeLoad path ops.size ops.metric
+    maybeA <- liftEff $ unsafeLoad path ops
     case maybeA of
       Nothing -> failure "load failed"
       Just a' -> do
@@ -61,4 +61,4 @@ createByReplicate
   -> Annoy s
 createByReplicate { trees, size, metric } arr =
   let vs = arr # map (replicate size <<< (_ / 100.0) <<< toNumber) in
-  fromVectors trees metric vs
+  fromVectors { trees , metric } vs

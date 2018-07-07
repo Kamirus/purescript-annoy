@@ -30,8 +30,8 @@ v2 :: Vec D2 Number
 v2 = 5.0 +> 6.0 +> empty
 
 newPush3Build :: forall t. Pos t => t -> Annoy D2
-newPush3Build trees = build trees (do
-  a <- new d2 Manhattan
+newPush3Build trees = build { trees } (do
+  a <- new { size: d2 , metric: Manhattan }
   push v0 a
   push v1 a
   push v2 a

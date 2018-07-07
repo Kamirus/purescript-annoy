@@ -31,26 +31,25 @@ import Partial.Unsafe (unsafePartial)
 import Unsafe.Coerce (unsafeCoerce)
 
 fromVectors
-  :: forall s t f
+  :: forall s t f o
    . Nat s
   => Foldable f
   => Pos t
-  => t
-  -> Metric
+  => { trees :: t , metric :: Metric | o }
   -> f (Vec s Number)
   -> Annoy s
-fromVectors trees metric vectors = unsafePartial $ fromJust $ fromVectors_ (toInt trees) metric vectors
+fromVectors ops vectors = unsafePartial $ fromJust $
+  fromVectors_ (ops { trees = toInt ops.trees }) vectors
 
 fromVectors_
-  :: forall s f
+  :: forall s f o
    . Nat s
   => Foldable f
-  => Int
-  -> Metric
+  => { trees :: Int , metric :: Metric | o }
   -> f (Vec s Number)
   -> Maybe (Annoy s)
-fromVectors_ trees metric vectors = build_ trees (do
-  a <- new (unsafeCoerce unit :: s) metric
+fromVectors_ ops@{ metric } vectors = build_ ops (do
+  a <- new { size: (unsafeCoerce unit :: s) , metric }
   traverse_ (\v -> push v a) vectors
   pure a)
 
@@ -73,17 +72,16 @@ length a = runPure (runST (U.getNItems $ unsafeCoerce a))
 save :: forall s r. String -> Annoy s -> Eff ( fs :: FS | r ) Boolean
 save path a = runST (U.save path $ unsafeCoerce a)
 
--- | `unsafeLoad path s metric` creates `STAnnoy` using `s` and `metric`, then loads annoy using `path`
--- | Unsafe aspect is that it does not check loaded vector sizes against `s`
+-- | `unsafeLoad path { size , metric }` creates `STAnnoy` using `size` and `metric`, then loads annoy using `path`
+-- | Unsafe aspect is that it does not check loaded vector sizes against `size`
 unsafeLoad
-  :: forall r s
+  :: forall r s o
    . Nat s
   => String
-  -> s
-  -> Metric
+  -> { size :: s , metric :: Metric | o }
   -> Eff ( fs :: FS | r ) (Maybe (Annoy s))
-unsafeLoad path s metric = runST (do
-  stAnnoy <- new s metric
+unsafeLoad path ops = runST (do
+  stAnnoy <- new ops
   isOk <- U.unsafeLoad path $ unsafeCoerce stAnnoy
   if isOk then Just <$> unsafeFreeze stAnnoy else pure Nothing)
 

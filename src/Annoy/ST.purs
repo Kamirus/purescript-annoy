@@ -18,45 +18,44 @@ import Data.Vec (Vec, toArray)
 import Partial.Unsafe (unsafePartial)
 import Unsafe.Coerce (unsafeCoerce)
 
--- | `build trees m` executes `m` which creates Annoy and adds vectors, then builds it using `trees` (more info in original [annoy](https://github.com/spotify/annoy))
+-- | `build { trees } m` executes `m` which creates Annoy and adds vectors, then builds it using `trees` (more info in original [annoy](https://github.com/spotify/annoy))
 -- | ```purescript
--- | a = build d1 (do
--- |   a <- new d2 Manhattan
+-- | a = build { trees: d1 } (do
+-- |   a <- new { size: d2 , metric: Manhattan }
 -- |   push (1.0 +> 2.0 +> empty) a
 -- |   push (3.0 +> 4.0 +> empty) a
 -- |   push (5.0 +> 6.0 +> empty) a
 -- |   pure a)
 -- | ```
 build
-  :: forall s t
+  :: forall s t o
    . Nat s
   => Pos t
-  => t
+  => { trees :: t | o }
   -> (forall h. Eff ( st :: ST h ) (STAnnoy h s))
   -> Annoy s
-build trees m = unsafePartial $ fromJust $ build_ (toInt trees) m
+build { trees } m = unsafePartial $ fromJust $ build_ { trees: toInt trees } m
 
 -- | Similar to `build` but `trees` argument is an Int, so return type is Maybe
 build_
-  :: forall s
+  :: forall s o
    . Nat s
-  => Int
+  => { trees :: Int | o }
   -> (forall h. Eff ( st :: ST h ) (STAnnoy h s))
   -> Maybe (Annoy s)
-build_ trees m | trees < 1 = Nothing
-build_ trees m | otherwise = Just $ runPure (runST (do 
+build_ { trees } m = if trees < 1 then Nothing
+  else Just $ runPure (runST (do 
   a <- m
   unsafeBuild trees $ unsafeCoerce a
   unsafeFreeze a))
 
--- | `new s metric` creates mutable annoy that stores vectors of size `s` and uses given `metric`
+-- | `new { size , metric }` creates mutable annoy that stores vectors of `size` and uses given `metric`
 new
-  :: forall h r s
+  :: forall h r s o
    . Nat s
-  => s
-  -> Metric
+  => { size :: s , metric :: Metric | o }
   -> Eff ( st :: ST h | r ) (STAnnoy h s)
-new s metric = unsafeCoerce $ unsafeNew (toInt s) $ strMetric metric
+new { size , metric } = unsafeCoerce $ unsafeNew (toInt size) $ strMetric metric
 
 -- | `push v annoy` adds vector `v` at index 'len' which is equal to the number of currently stored vectors
 push
