@@ -3,107 +3,105 @@ module Annoy.Unsafe where
 import Prelude
 
 import Annoy.Types (STPrimAnnoy)
-import Control.Monad.Eff (Eff)
-import Control.Monad.ST (ST)
-import Node.FS (FS)
+import Effect (Effect)
 
 -- | `unsafeNew f metric`
 -- | Creates new `STPrimAnnoy` that stores vector of `f` dimensions with `metric`. Does not validate input.
 foreign import unsafeNew
-  :: forall h r
+  :: forall h
    . Int
   -> String
-  -> Eff ( st :: ST h | r ) (STPrimAnnoy h)
+  -> Effect (STPrimAnnoy h)
 
 -- | Inserts vector at given index. No checks for: not frozen `STPrimAnnoy`, matching dimension, negative index.
-foreign import unsafeAddItem 
-  :: forall h r
+foreign import unsafeAddItem
+  :: forall h
    . STPrimAnnoy h
   -> Int
   -> Array Number
-  -> Eff ( st :: ST h | r ) Unit
+  -> Effect Unit
 
 -- | Builds a forest of given number of trees. After calling, no more items can be added.
 foreign import unsafeBuild
-  :: forall h r
+  :: forall h
    . STPrimAnnoy h
   -> Int
-  -> Eff ( st :: ST h | r ) Unit
+  -> Effect Unit
 
 -- | Saves the index to disk.
 foreign import save
-  :: forall h r
+  :: forall h
    . STPrimAnnoy h
   -> String
-  -> Eff ( st :: ST h, fs :: FS | r ) Boolean
+  -> Effect Boolean
 
 -- | Loads an index from disk.
 foreign import unsafeLoad
-  :: forall h r
+  :: forall h
    . STPrimAnnoy h
   -> String
-  -> Eff ( st :: ST h, fs :: FS | r ) Boolean
+  -> Effect Boolean
 
 foreign import unload
-  :: forall h r
+  :: forall h
    . STPrimAnnoy h
-  -> Eff ( st :: ST h, fs :: FS | r ) Unit
+  -> Effect Unit
 
 -- | Returns vector under given index. No bounds checks are performed.
 foreign import unsafeGetItem
-  :: forall h r
+  :: forall h
    . STPrimAnnoy h
   -> Int
-  -> Eff ( st :: ST h | r ) (Array Number)
+  -> Effect (Array Number)
 
 -- | `unsafeGetNNsByItem a i n search_k`
 -- | Returns `n` closest items to the `i`-th vector. No bounds checks are performed.
 foreign import unsafeGetNNsByItem
-  :: forall h r
+  :: forall h
    . STPrimAnnoy h
   -> Int
   -> Int
   -> Int
-  -> Eff ( st :: ST h | r ) (Array Int)
+  -> Effect (Array Int)
 
 -- | Like `unsafeGetNNsByItem` but returns also distances
 foreign import unsafeGetNNsByItem_
-  :: forall h r
+  :: forall h
    . STPrimAnnoy h
   -> Int
   -> Int
   -> Int
-  -> Eff ( st :: ST h | r ) { neighbors :: Array Int, distances :: Array Int }
+  -> Effect { neighbors :: Array Int, distances :: Array Int }
 
 -- | `unsafeGetNNsByVector a v n search_k`
 -- | Like above but query by vector v instead of index.
 foreign import unsafeGetNNsByVector
-  :: forall h r
+  :: forall h
    . STPrimAnnoy h
   -> Array Number
   -> Int
   -> Int
-  -> Eff ( st :: ST h | r ) (Array Int)
+  -> Effect (Array Int)
 
 -- | Like `unsafeGetNNsByVector` but returns also distances
 foreign import unsafeGetNNsByVector_
-  :: forall h r
+  :: forall h
    . STPrimAnnoy h
   -> Array Number
   -> Int
   -> Int
-  -> Eff ( st :: ST h | r ) { neighbors :: Array Int, distances :: Array Int }
+  -> Effect { neighbors :: Array Int, distances :: Array Int }
 
 -- | Returns number of (allocated!) elements in Annoy.
 foreign import getNItems
-  :: forall h r
+  :: forall h
    . STPrimAnnoy h
-  -> Eff ( st :: ST h | r ) Int
+  -> Effect Int
 
 -- | Returns the distance between items at positions `i` and `j`. No bounds checks are performed.
 foreign import unsafeGetDistance
-  :: forall h r
+  :: forall h
    . STPrimAnnoy h
   -> Int
   -> Int
-  -> Eff ( st :: ST h | r ) Number
+  -> Effect Number

@@ -10,11 +10,11 @@ import Prelude
 
 import Annoy.Types (Annoy, Metric, STAnnoy, strMetric)
 import Annoy.Unsafe (getNItems, unsafeAddItem, unsafeBuild, unsafeNew)
-import Control.Monad.Eff (Eff, runPure)
-import Control.Monad.ST (ST, runST)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Typelevel.Num (class Nat, class Pos, toInt)
 import Data.Vec (Vec, toArray)
+import Effect (Effect)
+import Effect.Unsafe (unsafePerformEffect)
 import Partial.Unsafe (unsafePartial)
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -32,7 +32,7 @@ build
    . Nat s
   => Pos t
   => { trees :: t | o }
-  -> (forall h. Eff ( st :: ST h ) (STAnnoy h s))
+  -> (forall h. Effect (STAnnoy h s))
   -> Annoy s
 build { trees } m = unsafePartial $ fromJust $ build_ { trees: toInt trees } m
 
@@ -41,36 +41,36 @@ build_
   :: forall s o
    . Nat s
   => { trees :: Int | o }
-  -> (forall h. Eff ( st :: ST h ) (STAnnoy h s))
+  -> (forall h. Effect (STAnnoy h s))
   -> Maybe (Annoy s)
 build_ { trees } m = if trees < 1 then Nothing
-  else Just $ runPure (runST (do 
-  a <- m
-  unsafeBuild (unsafeCoerce a) trees
-  unsafeFreeze a))
+  else Just $ unsafePerformEffect (do
+    a <- m
+    unsafeBuild (unsafeCoerce a) trees
+    unsafeFreeze a)
 
 -- | `new { size , metric }` creates mutable annoy that stores vectors of `size` and uses given `metric`
 new
-  :: forall h r s o
+  :: forall h s o
    . Nat s
   => { size :: s , metric :: Metric | o }
-  -> Eff ( st :: ST h | r ) (STAnnoy h s)
+  -> Effect (STAnnoy h s)
 new { size , metric } = unsafeCoerce $ unsafeNew (toInt size) $ strMetric metric
 
 -- | `push annoy v` adds vector `v` at index 'len' which is equal to the number of currently stored vectors
 push
-  :: forall h r s
+  :: forall h s
    . Nat s
   => STAnnoy h s
   -> Vec s Number
-  -> Eff ( st :: ST h | r ) Unit
+  -> Effect Unit
 push annoy v = do
   let a = unsafeCoerce annoy
   len <- getNItems a
   unsafeAddItem a len (toArray v)
 
 unsafeFreeze
-  :: forall h r s
+  :: forall h s
    . STAnnoy h s
-  -> Eff ( st :: ST h | r ) (Annoy s)
+  -> Effect (Annoy s)
 unsafeFreeze = pure <<< unsafeCoerce

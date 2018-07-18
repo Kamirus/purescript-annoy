@@ -19,14 +19,13 @@ import Prelude
 import Annoy.ST (build_, new, push, unsafeFreeze)
 import Annoy.Types (Annoy, Metric, STPrimAnnoy)
 import Annoy.Unsafe as U
-import Control.Monad.Eff (Eff, runPure)
-import Control.Monad.ST (ST, runST)
 import Data.Foldable (class Foldable, traverse_)
-import Data.Foreign.NullOrUndefined (undefined)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Typelevel.Num (class Nat, class Pos, toInt)
 import Data.Vec (Vec, fromArray, toArray)
-import Node.FS (FS)
+import Effect (Effect)
+import Effect.Unsafe (unsafePerformEffect)
+import Foreign.NullOrUndefined (undefined)
 import Partial.Unsafe (unsafePartial)
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -58,32 +57,32 @@ fromVectors_ ops@{ metric } vectors = build_ ops (do
 
 -- | `get annoy i` returns `i`-th vector. Performs bounds check.
 get :: forall s. Nat s => Annoy s -> Int -> Maybe (Vec s Number)
-get a i = 
+get a i =
   if 0 <= i && i < length a
   then Just $ unsafeGet a i
   else Nothing
 
 -- | Similar to `get` but no bounds checks are performed.
 unsafeGet :: forall s. Nat s => Annoy s -> Int -> Vec s Number
-unsafeGet a i = unsafeFromArray $ runPure (runST (U.unsafeGetItem (unsafeCoerce a) i))
+unsafeGet a i = unsafeFromArray $ unsafePerformEffect (U.unsafeGetItem (unsafeCoerce a) i)
 
 -- | `length annoy` returns number of stored vectors
 length :: forall s. Annoy s -> Int
-length a = runPure (runST (U.getNItems $ unsafeCoerce a))
+length a = unsafePerformEffect (U.getNItems $ unsafeCoerce a)
 
 -- | `save annoy path` dumps annoy to the file. Boolean indicates succes or failure.
-save :: forall s r. Annoy s -> String -> Eff ( fs :: FS | r ) Boolean
-save a path = runST (U.save (unsafeCoerce a) path)
+save :: forall s. Annoy s -> String -> Effect Boolean
+save a path = U.save (unsafeCoerce a) path
 
 -- | `unsafeLoad { size , metric } path` creates `STAnnoy` using `size` and `metric`, then loads annoy using `path`
 -- | Unsafe aspect is that it does not check loaded vector sizes against `size`
 unsafeLoad
-  :: forall r s o
+  :: forall s o
    . Nat s
   => { size :: s , metric :: Metric | o }
   -> String
-  -> Eff ( fs :: FS | r ) (Maybe (Annoy s))
-unsafeLoad ops path = runST (do
+  -> Effect (Maybe (Annoy s))
+unsafeLoad ops path = (do
   stAnnoy <- new ops
   isOk <- U.unsafeLoad (unsafeCoerce stAnnoy) path
   if isOk then Just <$> unsafeFreeze stAnnoy else pure Nothing)
@@ -140,14 +139,14 @@ nnsByVec_ = _nnsByVec U.unsafeGetNNsByVector_
 _nnsByVec
   :: forall s a
    . Nat s
-  => (forall h r. STPrimAnnoy h -> Array Number -> Int -> Int -> Eff ( st :: ST h | r ) a)
+  => (forall h. STPrimAnnoy h -> Array Number -> Int -> Int -> Effect a)
   -> Annoy s
   -> Vec s Number
   -> Int
   -> ({ searchK :: Int } -> { searchK :: Int })
   -> a
-_nnsByVec f a v n update = 
-  runPure (runST (f (unsafeCoerce a) (toArray v) n ops.searchK))
+_nnsByVec f a v n update =
+  unsafePerformEffect (f (unsafeCoerce a) (toArray v) n ops.searchK)
   where
   ops :: { searchK :: Int }
   ops = update { searchK: unsafeCoerce undefined }
@@ -158,7 +157,7 @@ distance a i j = if i < 0 || j < 0 || i >= n || j >= n then Nothing
   where n = length a
 
 unsafeDistance :: forall s. Nat s => Annoy s -> Int -> Int -> Number
-unsafeDistance a i j = runPure (runST (U.unsafeGetDistance (unsafeCoerce a) i j))
+unsafeDistance a i j = unsafePerformEffect (U.unsafeGetDistance (unsafeCoerce a) i j)
 
 unsafeFromArray :: forall a s. Nat s => Array a -> Vec s a
 unsafeFromArray arr = unsafePartial $ fromJust $ fromArray arr

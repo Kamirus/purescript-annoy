@@ -11,9 +11,9 @@ import Data.Vec (Vec, empty, (+>))
 import Test.Unit (TestF, suite, test)
 import Test.Unit.Assert (equal)
 
-testST :: forall t. Free (TestF t) Unit
+testST :: Free TestF Unit
 testST = suite "ST" do
-  suite "creations" do 
+  suite "creations" do
     test "new 3xpush build 3xget" do
       let a = newPush3Build d1
       equal v0 $ unsafeGet a 0
