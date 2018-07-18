@@ -19,16 +19,15 @@
   "devDependencies": {
     "purescript-console": "^4.0.0",
     "purescript-test-unit": "^14.0.0",
-    "purescript-psci-support": ""
+    "purescript-psci-support": "^4.0.0"
   },
   "dependencies": {
-    "purescript-sized-vectors": "",
-    "purescript-typelevel": "",
-    "purescript-node-fs": "",
-    "purescript-st": "",
-    "purescript-foreign-generic": "",
-    "purescript-foreign": "",
-    "purescript-console": "",
-    "purescript-prelude": ""
+    "purescript-sized-vectors": "^3.1.0",
+    "purescript-typelevel": "^4.0.0",
+    "purescript-node-fs": "^5.0.0",
+    "purescript-st": "^4.0.0",
+    "purescript-foreign-generic": "^7.0.0",
+    "purescript-foreign": "^5.0.0",
+    "purescript-prelude": "^4.1.0"
   }
 }
