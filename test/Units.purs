@@ -10,7 +10,7 @@ import Test.Unit.Assert (equal)
 import Test.Units.ST (newPush3Build, testST)
 import Test.Units.Unsafe (testUnsafe)
 
-units :: forall r. Free (TestF r) Unit
+units :: Free TestF Unit
 units = suite "Units" do
   testUnsafe
   testST
